@@ -1,5 +1,7 @@
 package com.example.sicaksumobileapp.models;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -10,6 +12,7 @@ public class SicakSuEvent {
     int limit;
     int joinCount;
     List<SicakSuProfile> joinedPeople;
+    LocalDateTime requestDate;
 
     public SicakSuEvent() {
         this.id = "None";
@@ -18,6 +21,26 @@ public class SicakSuEvent {
         this.limit = 0;
         this.joinCount = 0;
         this.joinedPeople = null;
+        this.requestDate = LocalDateTime.from(Instant.EPOCH);
+    }
+
+    public SicakSuEvent(String content, String headline, int limit, int joinCount, List<SicakSuProfile> joinedPeople, LocalDateTime requestDate) {
+        this.content = content;
+        this.headline = headline;
+        this.limit = limit;
+        this.joinCount = joinCount;
+        this.joinedPeople = joinedPeople;
+        this.requestDate = requestDate;
+    }
+
+    public SicakSuEvent(String id, String content, String headline, int limit, int joinCount, List<SicakSuProfile> joinedPeople, LocalDateTime requestDate) {
+        this.id = id;
+        this.content = content;
+        this.headline = headline;
+        this.limit = limit;
+        this.joinCount = joinCount;
+        this.joinedPeople = joinedPeople;
+        this.requestDate = requestDate;
     }
 
     public SicakSuEvent(String id, String content, String headline, int limit, int joinCount, List<SicakSuProfile> joinedPeople) {
@@ -79,11 +102,21 @@ public class SicakSuEvent {
     @Override
     public String toString() {
         return "SicakSuEvent{" +
-                "content='" + content + '\'' +
+                "id='" + id + '\'' +
+                ", content='" + content + '\'' +
                 ", headline='" + headline + '\'' +
                 ", limit=" + limit +
                 ", joinCount=" + joinCount +
+                ", joinedPeople=" + joinedPeople +
+                ", requestDate=" + requestDate +
                 '}';
     }
 
+    public LocalDateTime getRequestDate() {
+        return requestDate;
+    }
+
+    public void setRequestDate(LocalDateTime requestDate) {
+        this.requestDate = requestDate;
+    }
 }
