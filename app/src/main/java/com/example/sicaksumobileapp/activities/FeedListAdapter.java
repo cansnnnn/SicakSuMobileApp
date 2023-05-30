@@ -1,5 +1,6 @@
 package com.example.sicaksumobileapp.activities;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -59,15 +60,58 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.FeedLi
         return holder;
     }
 
+
+
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull FeedListViewHolder holder, int position) {
 
         SicakSuApp app = (SicakSuApp)((Activity)context).getApplication();
+        SicakSuProfile yourProfile = new SicakSuProfile("6471dc1fe27cea661daa54b9","John","Doe","https://pbs.twimg.com/media/FjU2lkcWYAgNG6d.jpg");
+        // Create a handler to handle the join event response
+        Handler leaveHandler = new Handler(message -> {
+            if ("leaved".equals(message.obj)) {
+                // The join event was successful
+                List<SicakSuProfile> newPro = new ArrayList<>();
+                newPro.addAll(data.get(position).getJoinedPeople());
+                newPro.remove(yourProfile);
 
+                data.get(position).setJoinedPeople(newPro);
+                data.get(position).setJoinCount(data.get(position).getJoinCount() - 1);
+                String joinCount = String.valueOf(data.get(position).getJoinCount()) + "/" + String.valueOf(data.get(position).getLimit());
+                holder.rowJoinCount.setText(joinCount);
+                Snackbar.make(holder.itemView, "Leaved", Snackbar.LENGTH_SHORT).show();
+                holder.joinButton.setText("Join");
+            } else if ("notLeaved".equals(message.obj)) {
+                // The join event failed
+                Snackbar.make(holder.itemView, "Not leaved", Snackbar.LENGTH_SHORT).show();
+            }
+            return true;
+        });
+        // Create a handler to handle the join event response
+        Handler joinHandler = new Handler(message -> {
+            if ("joined".equals(message.obj)) {
+                // The join event was successful
+                List<SicakSuProfile> newPro = new ArrayList<>();
+                newPro.addAll(data.get(position).getJoinedPeople());
+                newPro.add(yourProfile);
+
+                data.get(position).setJoinedPeople(newPro);
+                data.get(position).setJoinCount(data.get(position).getJoinCount() + 1);
+                String joinCount = String.valueOf(data.get(position).getJoinCount()) + "/" + String.valueOf(data.get(position).getLimit());
+                holder.rowJoinCount.setText(joinCount);
+                Snackbar.make(holder.itemView, "Joined", Snackbar.LENGTH_SHORT).show();
+                holder.joinButton.setText("Leave");
+            } else if ("notJoined".equals(message.obj)) {
+                // The join event failed
+                Snackbar.make(holder.itemView, "Not Joined", Snackbar.LENGTH_SHORT).show();
+            }
+            return true;
+        });
         //then manage the list selection/click event
 
         holder.row.setOnClickListener(v->{
-
+            data.get(position).getJoinedPeople().forEach(x->{Log.e("index:"+String.valueOf(position), x.toString());});
 //            Intent i = new Intent(context,ActivityDetails.class);
 //            i.putExtra("id",data.get(position).getId());
 //
@@ -75,32 +119,14 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.FeedLi
             Log.e("Beyza","BASILDIM");
         });
         holder.joinButton.setOnClickListener(v->{
-            /*
-            //todo: when add profile change here to your profile
-            SicakSuProfile yourProfile = new SicakSuProfile("6471dc1fe27cea661daa54b9","Hello","Carta","Nakama");
-
-            if(sicakEvent.getJoinedPeople().contains(yourProfile)
-            && sicakEvent.getLimit() > sicakEvent.getJoinCount()){
-                EventRepo repo = new EventRepo();
-
-                int answer = repo.joinEvent(yourProfile.getId(),sicakEvent.getId());
-                if(answer == 1){
-                    List<SicakSuProfile> newPro = new ArrayList<>();
-                    newPro.addAll(data.get(position).getJoinedPeople());
-                    newPro.add(yourProfile);
-
-
-                    data.get(position).setJoinedPeople(newPro);
-                    SicakSuEvent sicakEvent = data.get(position);
-                    data.get(position).setJoinCount(data.get(position).getJoinCount()+1);
-                    String joinCount = String.valueOf(data.get(position).getJoinCount())+"/"+ String.valueOf(data.get(position).getLimit());
-                    holder.rowJoinCount.setText(joinCount);
-                }
-
+            EventRepo repo = new EventRepo();
+            if(data.get(position).getJoinedPeople().contains(yourProfile)){
+                repo.leaveEvent(app.srv, leaveHandler, data.get(position).getId(), yourProfile.getId());
+                Log.e("LeaveButton","pressed");
+            }else{
+                repo.joinEvent(app.srv, joinHandler, data.get(position).getId(), yourProfile.getId());
+                Log.e("JoinButton","pressed");
             }
-                */
-
-            Log.e("JoinButton","pressed");
         });
         holder.downloadImage(app.srv,data.get(position).getCreatedBy().getImageUrl());
         holder.rowHeadline.setText(data.get(position).getHeadline());
@@ -113,6 +139,17 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.FeedLi
         String formattedDateTime = data.get(position).getRequestDate().format(formatter);
         holder.rowRequestDate.setText(formattedDateTime);
         holder.name.setText(data.get(position).getCreatedBy().getName());
+
+        //if it is your event do not show join button
+        if(data.get(position).getCreatedBy().equals(yourProfile)){
+            holder.joinButton.setVisibility(View.INVISIBLE);
+        }else{
+            if(data.get(position).getJoinedPeople().contains(yourProfile)){
+                holder.joinButton.setText("Leave");
+            }else{
+                holder.joinButton.setText("Join");
+            }
+        }
     }
 
     @Override

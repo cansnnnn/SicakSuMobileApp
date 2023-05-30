@@ -55,7 +55,7 @@ public class EventRepo {
                 StringBuilder buffer = new StringBuilder();
                 String line ="";
                 while((line=reader.readLine())!=null){
-                    Log.e("Noluyo",line);
+                    //Log.e("Noluyo",line);
                     buffer.append(line);
                 }
 
@@ -75,6 +75,7 @@ public class EventRepo {
                                 currentPeople.getString("lastname"),
                                 currentPeople.getString("imageUrl")
                         );
+                        joinedPeople.add(currentProfile);
                     }
                     JSONObject createdByJson = current.getJSONObject("createdBy");
                     SicakSuProfile createdBy = new SicakSuProfile(
@@ -115,7 +116,7 @@ public class EventRepo {
             try {
                 // bu emulatorde calistigi icin local hosta baglanmasi icin lazimmis
                 URL url =
-                        new URL("http://"+yourIp+":8080/sicaksu/profile"+profileId+"/event"+eventId);
+                        new URL("http://"+yourIp+":8080/sicaksu/profile/"+profileId+"/event/"+eventId);
 
                 // Create a new HttpURLConnection object
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -152,12 +153,12 @@ public class EventRepo {
 
     }
 
-    public void deleteEvent(ExecutorService srv, Handler uiHandler,String eventId,String profileId){
+    public void leaveEvent(ExecutorService srv, Handler uiHandler,String eventId,String profileId){
         srv.submit(()->{
             try {
                 // bu emulatorde calistigi icin local hosta baglanmasi icin lazimmis
                 URL url =
-                        new URL("http://"+yourIp+":8080/sicaksu/profile"+profileId+"/event"+eventId);
+                        new URL("http://"+yourIp+":8080/sicaksu/profile/"+profileId+"/event/"+eventId);
 
                 // Create a new HttpURLConnection object
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -175,12 +176,12 @@ public class EventRepo {
                 if (responseCode == HttpURLConnection.HTTP_OK) {
                     // The request was successful
                     Message msg = new Message();
-                    msg.obj = "joined";
+                    msg.obj = "leaved";
                     uiHandler.sendMessage(msg);
                 } else {
                     // The request failed
                     Message msg = new Message();
-                    msg.obj = "notJoined";
+                    msg.obj = "notLeaved";
                     uiHandler.sendMessage(msg);
                 }
 
