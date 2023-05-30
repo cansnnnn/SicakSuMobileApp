@@ -1,5 +1,7 @@
 package com.example.sicaksumobileapp.repository;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -74,6 +76,13 @@ public class EventRepo {
                                 currentPeople.getString("imageUrl")
                         );
                     }
+                    JSONObject createdByJson = current.getJSONObject("createdBy");
+                    SicakSuProfile createdBy = new SicakSuProfile(
+                            createdByJson.getString("id"),
+                            createdByJson.getString("name"),
+                            createdByJson.getString("lastname"),
+                            createdByJson.getString("imageUrl")
+                    );
                     //create event class with taken informations from request
                     SicakSuEvent sicakEvent = new SicakSuEvent(
                             current.getString("id"),
@@ -82,7 +91,9 @@ public class EventRepo {
                             current.getInt("limit"),
                             current.getInt("joinCount"),
                             joinedPeople,
-                            StringToDate(current.getString("requestDate")));
+                            StringToDate(current.getString("requestDate")),
+                            createdBy
+                            );
 
                     data.add(sicakEvent);
                 }
@@ -90,6 +101,7 @@ public class EventRepo {
                 Message msg = new Message();
                 msg.obj = data;
                 uiHandler.sendMessage(msg);
+                conn.disconnect();
 
             } catch (JSONException | IOException e) {
                 Log.e("DEV",e.getMessage());
@@ -97,6 +109,121 @@ public class EventRepo {
         });
 
     }
+
+    public void joinEvent(ExecutorService srv, Handler uiHandler,String eventId,String profileId){
+        srv.submit(()->{
+            try {
+                // bu emulatorde calistigi icin local hosta baglanmasi icin lazimmis
+                URL url =
+                        new URL("http://"+yourIp+":8080/sicaksu/profile"+profileId+"/event"+eventId);
+
+                // Create a new HttpURLConnection object
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+                // Set the request method to POST
+                conn.setRequestMethod("POST");
+
+                // Set any additional headers if required
+                // conn.setRequestProperty("Content-Type", "application/json");
+
+                // Optionally, set request parameters or pass request body
+
+                // Check the response code to handle success or failure
+                int responseCode = conn.getResponseCode();
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    // The request was successful
+                    Message msg = new Message();
+                    msg.obj = "joined";
+                    uiHandler.sendMessage(msg);
+                } else {
+                    // The request failed
+                    Message msg = new Message();
+                    msg.obj = "notJoined";
+                    uiHandler.sendMessage(msg);
+                }
+
+                // Close the connection
+                conn.disconnect();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+    }
+
+    public void deleteEvent(ExecutorService srv, Handler uiHandler,String eventId,String profileId){
+        srv.submit(()->{
+            try {
+                // bu emulatorde calistigi icin local hosta baglanmasi icin lazimmis
+                URL url =
+                        new URL("http://"+yourIp+":8080/sicaksu/profile"+profileId+"/event"+eventId);
+
+                // Create a new HttpURLConnection object
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+                // Set the request method to POST
+                conn.setRequestMethod("DELETE");
+
+                // Set any additional headers if required
+                // conn.setRequestProperty("Content-Type", "application/json");
+
+                // Optionally, set request parameters or pass request body
+
+                // Check the response code to handle success or failure
+                int responseCode = conn.getResponseCode();
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    // The request was successful
+                    Message msg = new Message();
+                    msg.obj = "joined";
+                    uiHandler.sendMessage(msg);
+                } else {
+                    // The request failed
+                    Message msg = new Message();
+                    msg.obj = "notJoined";
+                    uiHandler.sendMessage(msg);
+                }
+
+                // Close the connection
+                conn.disconnect();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+    }
+
+
+
+    public void downloadImage(ExecutorService srv, Handler uiHandler, String path) {
+
+        srv.submit(() -> {
+            try {
+                URL url =
+                        new URL(path);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+                Bitmap bmp = BitmapFactory.decodeStream(conn.getInputStream());
+
+                Message msg = new Message();
+                msg.obj = bmp;
+                uiHandler.sendMessage(msg);
+
+            } catch (MalformedURLException e) {
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+
+        });
+    }
+
+
+
+
+
 
     public LocalDateTime StringToDate(String dateString){
         String pattern = "yyyy-MM-dd'T'HH:mm:ss";

@@ -13,6 +13,26 @@ public class SicakSuEvent {
     int joinCount;
     List<SicakSuProfile> joinedPeople;
     LocalDateTime requestDate;
+    SicakSuProfile createdBy;
+
+    public SicakSuEvent(String id, String content, String headline, int limit, int joinCount, List<SicakSuProfile> joinedPeople, LocalDateTime requestDate, SicakSuProfile createdBy) {
+        this.id = id;
+        this.content = content;
+        this.headline = headline;
+        this.limit = limit;
+        this.joinCount = joinCount;
+        this.joinedPeople = joinedPeople;
+        this.requestDate = requestDate;
+        this.createdBy = createdBy;
+    }
+
+    public SicakSuProfile getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(SicakSuProfile createdBy) {
+        this.createdBy = createdBy;
+    }
 
     public SicakSuEvent() {
         this.id = "None";
@@ -22,6 +42,7 @@ public class SicakSuEvent {
         this.joinCount = 0;
         this.joinedPeople = null;
         this.requestDate = LocalDateTime.from(Instant.EPOCH);
+        this.createdBy = null;
     }
 
     public SicakSuEvent(String content, String headline, int limit, int joinCount, List<SicakSuProfile> joinedPeople, LocalDateTime requestDate) {
