@@ -38,6 +38,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.FeedActivity" />
         </activity>
+        <activity
+            android:name=".activities.ProfileActivity"
+            android:exported="true">
+        </activity>
     </application>
 
 </manifest>

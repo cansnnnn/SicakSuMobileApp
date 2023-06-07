@@ -3,6 +3,7 @@ package com.example.sicaksumobileapp.activities;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Message;
@@ -108,16 +109,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.FeedLi
             }
             return true;
         });
-        //then manage the list selection/click event
-
-        holder.row.setOnClickListener(v->{
-            data.get(position).getJoinedPeople().forEach(x->{Log.e("index:"+String.valueOf(position), x.toString());});
-//            Intent i = new Intent(context,ActivityDetails.class);
-//            i.putExtra("id",data.get(position).getId());
-//
-//            ((Activity)context).startActivity(i);
-            Log.e("Beyza","BASILDIM");
-        });
+        // join button
         holder.joinButton.setOnClickListener(v->{
             EventRepo repo = new EventRepo();
             if(data.get(position).getJoinedPeople().contains(yourProfile)){
@@ -127,6 +119,33 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.FeedLi
                 repo.joinEvent(app.srv, joinHandler, data.get(position).getId(), yourProfile.getId());
                 Log.e("JoinButton","pressed");
             }
+        });
+        // go to the profile detailed page
+        holder.rowProfilePicture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int clickedPosition = holder.getAdapterPosition();
+
+                // Handle the click on the profile picture
+                Intent i = new Intent(context,ProfileActivity.class);
+                i.putExtra("id",data.get(clickedPosition).getId());
+
+                (context).startActivity(i);
+                Snackbar.make(holder.itemView, "Profile Picutre pressed", Snackbar.LENGTH_SHORT).show();
+
+            }
+        });
+
+        // go to the activity detailed page
+        holder.row.setOnClickListener(v->{
+            data.get(position).getJoinedPeople().forEach(x->{Log.e("index:"+String.valueOf(position), x.toString());});
+//            Intent i = new Intent(context,ActivityDetails.class);
+//            i.putExtra("id",data.get(position).getId());
+//
+//            ((Activity)context).startActivity(i);
+            Snackbar.make(holder.itemView, "Row pressed", Snackbar.LENGTH_SHORT).show();
+
+            Log.e("Beyza","BASILDIM");
         });
         holder.downloadImage(app.srv,data.get(position).getCreatedBy().getImageUrl());
         holder.rowHeadline.setText(data.get(position).getHeadline());
