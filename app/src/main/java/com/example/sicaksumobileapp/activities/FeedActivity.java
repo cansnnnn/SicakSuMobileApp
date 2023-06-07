@@ -39,11 +39,26 @@ public class FeedActivity extends AppCompatActivity {
             FeedListAdapter adp
                     = new FeedListAdapter(FeedActivity.this,data);
             recView.setAdapter(adp);
+            recView.setVisibility(View.VISIBLE);
             fab.setVisibility(View.VISIBLE);
             prgBar.setVisibility(View.INVISIBLE);
             return true;
         }
     });
+
+    // when this page is opened again fetch data again
+    @Override
+    protected void onResume() {
+        super.onResume();
+        recView.setVisibility(View.INVISIBLE);
+        fab.setVisibility(View.INVISIBLE);
+        prgBar.setVisibility(View.VISIBLE);
+        EventRepo repo = new EventRepo();
+        repo.getAllEvents(((SicakSuApp)getApplication()).srv,handler);
+
+        // Example: Show a toast message
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
