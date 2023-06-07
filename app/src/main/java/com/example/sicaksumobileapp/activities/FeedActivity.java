@@ -72,7 +72,8 @@ public class FeedActivity extends AppCompatActivity {
                 // Create an Intent to open CreateEventActivity
                 Intent intent = new Intent(FeedActivity.this, CreateEventActivity.class);
                 //todo: change this with global yourProfile
-                SicakSuProfile yourProfile = new SicakSuProfile("6471dc1fe27cea661daa54b9","John","Doe","https://pbs.twimg.com/media/FjU2lkcWYAgNG6d.jpg");
+                SicakSuProfile yourProfile = ((SicakSuApp)getApplication()).getUserProfile();
+
                 // Pass the profile information to the intent
                 intent.putExtra("profileId", yourProfile.getId());
 

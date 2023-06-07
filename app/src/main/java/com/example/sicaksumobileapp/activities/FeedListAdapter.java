@@ -68,7 +68,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.FeedLi
     public void onBindViewHolder(@NonNull FeedListViewHolder holder, int position) {
 
         SicakSuApp app = (SicakSuApp)((Activity)context).getApplication();
-        SicakSuProfile yourProfile = new SicakSuProfile("6471dc1fe27cea661daa54b9","John","Doe","https://pbs.twimg.com/media/FjU2lkcWYAgNG6d.jpg");
+        SicakSuProfile yourProfile = app.getUserProfile();
         // Create a handler to handle the join event response
         Handler leaveHandler = new Handler(message -> {
             if ("leaved".equals(message.obj)) {
@@ -124,11 +124,13 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.FeedLi
         holder.rowProfilePicture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.e("pp","BASILDIM");
+
                 int clickedPosition = holder.getAdapterPosition();
 
                 // Handle the click on the profile picture
                 Intent i = new Intent(context,ProfileActivity.class);
-                i.putExtra("id",data.get(clickedPosition).getId());
+                i.putExtra("id",data.get(clickedPosition).getCreatedBy().getId());
 
                 (context).startActivity(i);
                 Snackbar.make(holder.itemView, "Profile Picutre pressed", Snackbar.LENGTH_SHORT).show();
@@ -138,12 +140,17 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.FeedLi
 
         // go to the activity detailed page
         holder.row.setOnClickListener(v->{
+            Log.e("row","BASILDIM");
+
             data.get(position).getJoinedPeople().forEach(x->{Log.e("index:"+String.valueOf(position), x.toString());});
-//            Intent i = new Intent(context,ActivityDetails.class);
-//            i.putExtra("id",data.get(position).getId());
-//
-//            ((Activity)context).startActivity(i);
-            Snackbar.make(holder.itemView, "Row pressed", Snackbar.LENGTH_SHORT).show();
+            int clickedPosition = holder.getAdapterPosition();
+
+            // Handle the click on the profile picture
+            Intent i = new Intent(context,EventActivity.class);
+            i.putExtra("id",data.get(clickedPosition).getId());
+
+            (context).startActivity(i);
+            Snackbar.make(holder.itemView, "Event pressed", Snackbar.LENGTH_SHORT).show();
 
             Log.e("Beyza","BASILDIM");
         });
