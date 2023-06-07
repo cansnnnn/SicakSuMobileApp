@@ -38,6 +38,9 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         registerButton.setOnClickListener(v->{
+            // Create an Intent to open CreateEventActivity
+            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+            startActivity(intent);
 
         });
     }

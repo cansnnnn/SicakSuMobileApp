@@ -6,8 +6,10 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import com.example.sicaksumobileapp.models.AuthenticationPayload;
 import com.example.sicaksumobileapp.models.SicakSuEvent;
 import com.example.sicaksumobileapp.models.SicakSuProfile;
+import com.example.sicaksumobileapp.models.SicakSuUser;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -249,9 +251,96 @@ public class EventRepo {
         });
     }
 
+    public void register(ExecutorService srv, Handler uiHandler, String username, String password, String imageUrl, String firstName, String lastName) {
+        srv.submit(() -> {
+            try {
+                // Construct the request URL
+                URL url = new URL("http://" + yourIp + ":8080/sicaksu/register");
+
+                // Create a new HttpURLConnection object
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+                // Set the request method to POST
+                conn.setRequestMethod("POST");
+
+                // Set the Content-Type header to indicate the request body format
+                conn.setRequestProperty("Content-Type", "application/json");
+
+                // Create a JSON object to hold the user information
+                JSONObject requestBody = new JSONObject();
+                requestBody.put("username", username);
+                requestBody.put("password", password);
+
+                // Create a JSON object to hold the profile information
+                JSONObject profile = new JSONObject();
+                profile.put("name", firstName);
+                profile.put("lastname", lastName);
+                profile.put("imageUrl", imageUrl);
+
+                // Add the profile object to the main user object
+                requestBody.put("profile", profile);
+
+                // Convert the JSON object to a byte array
+                byte[] postDataBytes = requestBody.toString().getBytes("UTF-8");
+
+                // Enable output and set the content length of the request body
+                conn.setDoOutput(true);
+                conn.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
+
+                // Write the request body bytes to the connection's output stream
+                conn.getOutputStream().write(postDataBytes);
+
+                // Check the response code to handle success or failure
+                int responseCode = conn.getResponseCode();
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    // The request was successful
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    StringBuilder response = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        response.append(line);
+                    }
+                    reader.close();
+
+                    // Parse the response JSON
+                    JSONObject responseJson = new JSONObject(response.toString());
+                    JSONObject profileJson = responseJson.getJSONObject("profile");
+
+                    // Create a new user object with the profile data
+                    AuthenticationPayload payload = new AuthenticationPayload();
+                    payload.setProfile(new SicakSuProfile(
+                            profileJson.getString("id"),
+                            profileJson.getString("name"),
+                            profileJson.getString("lastname"),
+                            profileJson.getString("imageUrl")
+                    ));
+                    payload.setStatus("authenticated");
+
+                    // Send the user object to the UI thread
+                    Message msg = new Message();
+                    //using payload because I want to send status and profile information
+                    msg.obj = payload;
+                    uiHandler.sendMessage(msg);
+                } else {
+                    // The request failed
+                    Message msg = new Message();
+                    AuthenticationPayload payload = new AuthenticationPayload();
+                    payload.setStatus("notAuthenticated");
+                    //using payload because I want to send status and profile information
+                    msg.obj = payload;
+                    uiHandler.sendMessage(msg);
+                }
+
+                // Close the connection
+                conn.disconnect();
+
+            } catch (IOException | JSONException e) {
+                e.printStackTrace();
+            }
+        });
+    }
 
     public void downloadImage(ExecutorService srv, Handler uiHandler, String path) {
-
         srv.submit(() -> {
             try {
                 URL url =
