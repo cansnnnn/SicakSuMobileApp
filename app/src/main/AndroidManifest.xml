@@ -30,6 +30,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".activities.CreateEventActivity"
+            android:exported="true"
+            android:parentActivityName=".activities.FeedActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.FeedActivity" />
+        </activity>
     </application>
 
 </manifest>

@@ -150,7 +150,6 @@ public class EventRepo {
                 e.printStackTrace();
             }
         });
-
     }
 
     public void leaveEvent(ExecutorService srv, Handler uiHandler,String eventId,String profileId){
@@ -195,6 +194,60 @@ public class EventRepo {
 
     }
 
+    public void createEvent(ExecutorService srv, Handler uiHandler, String profileId, String content, String headline, int limit, LocalDateTime requestDate) {
+        srv.submit(() -> {
+            try {
+                // Construct the request URL
+                URL url = new URL("http://" + yourIp + ":8080/sicaksu/event/" + profileId);
+
+                // Create a new HttpURLConnection object
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+                // Set the request method to POST
+                conn.setRequestMethod("POST");
+
+                // Set the Content-Type header to indicate the request body format
+                conn.setRequestProperty("Content-Type", "application/json");
+
+                // Create a JSON object to hold the event information
+                JSONObject requestBody = new JSONObject();
+                requestBody.put("content", content);
+                requestBody.put("headline", headline);
+                requestBody.put("limit", limit);
+                requestBody.put("requestDate", requestDate.toString());
+
+                // Convert the JSON object to a byte array
+                byte[] postDataBytes = requestBody.toString().getBytes("UTF-8");
+
+                // Enable output and set the content length of the request body
+                conn.setDoOutput(true);
+                conn.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
+
+                // Write the request body bytes to the connection's output stream
+                conn.getOutputStream().write(postDataBytes);
+
+                // Check the response code to handle success or failure
+                int responseCode = conn.getResponseCode();
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    // The request was successful
+                    Message msg = new Message();
+                    msg.obj = "created";
+                    uiHandler.sendMessage(msg);
+                } else {
+                    // The request failed
+                    Message msg = new Message();
+                    msg.obj = "notCreated";
+                    uiHandler.sendMessage(msg);
+                }
+
+                // Close the connection
+                conn.disconnect();
+
+            } catch (IOException | JSONException e) {
+                e.printStackTrace();
+            }
+        });
+    }
 
 
     public void downloadImage(ExecutorService srv, Handler uiHandler, String path) {

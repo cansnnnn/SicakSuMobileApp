@@ -1,8 +1,10 @@
 package com.example.sicaksumobileapp.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -16,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.sicaksumobileapp.R;
 import com.example.sicaksumobileapp.SicakSuApp;
 import com.example.sicaksumobileapp.models.SicakSuEvent;
+import com.example.sicaksumobileapp.models.SicakSuProfile;
 import com.example.sicaksumobileapp.repository.EventRepo;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -51,10 +54,15 @@ public class FeedActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Perform your desired action here
-                // This code will be executed when the FloatingActionButton is clicked
-                // Add your custom logic or functionality
+                // Create an Intent to open CreateEventActivity
+                Intent intent = new Intent(FeedActivity.this, CreateEventActivity.class);
+                //todo: change this with global yourProfile
+                SicakSuProfile yourProfile = new SicakSuProfile("6471dc1fe27cea661daa54b9","John","Doe","https://pbs.twimg.com/media/FjU2lkcWYAgNG6d.jpg");
+                // Pass the profile information to the intent
+                intent.putExtra("profileId", yourProfile.getId());
 
+                // Start the CreateEventActivity
+                startActivity(intent);
                 // Show a Snackbar with a message
                 Snackbar.make(v, "Create Activity", Snackbar.LENGTH_SHORT).show();
             }
