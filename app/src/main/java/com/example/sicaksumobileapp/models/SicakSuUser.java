@@ -1,6 +1,8 @@
 package com.example.sicaksumobileapp.models;
 
-public class SicakSuUser {
+import java.io.Serializable;
+
+public class SicakSuUser implements Serializable {
     public SicakSuUser(String userName, String password) {
         this.userName = userName;
         this.password = password;

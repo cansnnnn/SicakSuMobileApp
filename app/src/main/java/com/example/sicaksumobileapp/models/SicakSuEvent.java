@@ -1,11 +1,12 @@
 package com.example.sicaksumobileapp.models;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
-public class SicakSuEvent {
+public class SicakSuEvent implements Serializable {
     String id;
     String content;
     String headline;

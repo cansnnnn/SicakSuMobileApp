@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.sicaksumobileapp.R;
 import com.example.sicaksumobileapp.SicakSuApp;
+import com.example.sicaksumobileapp.activities.profile.ProfileActivity;
 import com.example.sicaksumobileapp.models.SicakSuEvent;
 import com.example.sicaksumobileapp.models.SicakSuProfile;
 import com.example.sicaksumobileapp.repository.EventRepo;
@@ -129,7 +130,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.FeedLi
                 int clickedPosition = holder.getAdapterPosition();
 
                 // Handle the click on the profile picture
-                Intent i = new Intent(context,ProfileActivity.class);
+                Intent i = new Intent(context, ProfileActivity.class);
                 i.putExtra("id",data.get(clickedPosition).getCreatedBy().getId());
 
                 (context).startActivity(i);
@@ -146,8 +147,8 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.FeedLi
             int clickedPosition = holder.getAdapterPosition();
 
             // Handle the click on the profile picture
-            Intent i = new Intent(context,EventActivity.class);
-            i.putExtra("id",data.get(clickedPosition).getId());
+            Intent i = new Intent(context,EventDetailActivity.class);
+            i.putExtra("event",data.get(clickedPosition));
 
             (context).startActivity(i);
             Snackbar.make(holder.itemView, "Event pressed", Snackbar.LENGTH_SHORT).show();

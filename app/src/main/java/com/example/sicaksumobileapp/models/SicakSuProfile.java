@@ -1,8 +1,9 @@
 package com.example.sicaksumobileapp.models;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class SicakSuProfile {
+public class SicakSuProfile implements Serializable {
     String id;
     String name;
     String surname;
