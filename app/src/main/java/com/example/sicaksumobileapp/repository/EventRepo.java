@@ -251,6 +251,86 @@ public class EventRepo {
         });
     }
 
+    public void login(ExecutorService srv, Handler uiHandler, String username, String password) {
+        srv.submit(() -> {
+            try {
+                // Construct the request URL
+                URL url = new URL("http://" + yourIp + ":8080/sicaksu/login");
+
+                // Create a new HttpURLConnection object
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+                // Set the request method to POST
+                conn.setRequestMethod("POST");
+
+                // Set the Content-Type header to indicate the request body format
+                conn.setRequestProperty("Content-Type", "application/json");
+
+                // Create a JSON object to hold the login information
+                JSONObject requestBody = new JSONObject();
+                requestBody.put("username", username);
+                requestBody.put("password", password);
+
+                // Convert the JSON object to a byte array
+                byte[] postDataBytes = requestBody.toString().getBytes("UTF-8");
+
+                // Enable output and set the content length of the request body
+                conn.setDoOutput(true);
+                conn.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
+
+                // Write the request body bytes to the connection's output stream
+                conn.getOutputStream().write(postDataBytes);
+
+                // Check the response code to handle success or failure
+                int responseCode = conn.getResponseCode();
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    // The login was successful
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    StringBuilder response = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        response.append(line);
+                    }
+                    reader.close();
+
+                    // Parse the response JSON
+                    JSONObject responseJson = new JSONObject(response.toString());
+
+                    // Extract the user profile information
+                    JSONObject profileJson = responseJson.getJSONObject("profile");
+
+                    // Create a new user object with the profile data
+                    AuthenticationPayload payload = new AuthenticationPayload();
+                    payload.setProfile(new SicakSuProfile(
+                            profileJson.getString("id"),
+                            profileJson.getString("name"),
+                            profileJson.getString("lastname"),
+                            profileJson.getString("imageUrl")
+                    ));
+                    payload.setStatus("authenticated");
+
+                    // Send the user object to the UI thread
+                    Message msg = new Message();
+                    msg.obj = payload;
+                    uiHandler.sendMessage(msg);
+                } else {
+                    // The login failed
+                    Message msg = new Message();
+                    AuthenticationPayload payload = new AuthenticationPayload();
+                    payload.setStatus("notAuthenticated");
+                    msg.obj = payload;
+                    uiHandler.sendMessage(msg);
+                }
+
+                // Close the connection
+                conn.disconnect();
+
+            } catch (IOException | JSONException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
     public void register(ExecutorService srv, Handler uiHandler, String username, String password, String imageUrl, String firstName, String lastName) {
         srv.submit(() -> {
             try {
