@@ -65,7 +65,7 @@ public class JoinedEventAdapter extends RecyclerView.Adapter<JoinedEventAdapter.
             public void onClick(View v) {
                 // Start the DetailActivity and pass necessary data
                 Intent intent = new Intent(context, EventDetailActivity.class);
-                intent.putExtra("event", event.toString());
+                intent.putExtra("event", event);
                 context.startActivity(intent);
             }
         });

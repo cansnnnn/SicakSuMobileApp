@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.sicaksumobileapp.R;
 import com.example.sicaksumobileapp.SicakSuApp;
+import com.example.sicaksumobileapp.activities.profile.ProfileActivity;
 import com.example.sicaksumobileapp.models.SicakSuEvent;
 import com.example.sicaksumobileapp.models.SicakSuProfile;
 import com.example.sicaksumobileapp.repository.EventRepo;
@@ -30,6 +31,7 @@ public class FeedActivity extends AppCompatActivity {
     RecyclerView recView;
     ProgressBar prgBar;
     FloatingActionButton fab;
+    FloatingActionButton goProfile;
 
     Handler handler = new Handler(new Handler.Callback() {
         @Override
@@ -41,7 +43,10 @@ public class FeedActivity extends AppCompatActivity {
             recView.setAdapter(adp);
             recView.setVisibility(View.VISIBLE);
             fab.setVisibility(View.VISIBLE);
+            goProfile.setVisibility(View.VISIBLE);
+
             prgBar.setVisibility(View.INVISIBLE);
+
             return true;
         }
     });
@@ -53,6 +58,7 @@ public class FeedActivity extends AppCompatActivity {
         recView.setVisibility(View.INVISIBLE);
         fab.setVisibility(View.INVISIBLE);
         prgBar.setVisibility(View.VISIBLE);
+        goProfile.setVisibility(View.INVISIBLE);
         EventRepo repo = new EventRepo();
         repo.getAllEvents(((SicakSuApp)getApplication()).srv,handler);
 
@@ -66,6 +72,25 @@ public class FeedActivity extends AppCompatActivity {
         prgBar = findViewById(R.id.feedProgresBar);
         recView = findViewById(R.id.recyclerViewFeed);
         fab = findViewById(R.id.createEventButton);
+        goProfile = findViewById(R.id.goProfileButton);
+        // go to your profile
+        goProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Create an Intent to open CreateEventActivity
+                Intent intent = new Intent(FeedActivity.this, ProfileActivity.class);
+                SicakSuProfile yourProfile = ((SicakSuApp)getApplication()).getUserProfile();
+
+                // Pass the profile information to the intent
+                intent.putExtra("id", yourProfile.getId());
+
+                // Start the CreateEventActivity
+                startActivity(intent);
+                // Show a Snackbar with a message
+                Snackbar.make(v, "Profile Page", Snackbar.LENGTH_SHORT).show();
+            }
+        });
+        // go to create event activity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
