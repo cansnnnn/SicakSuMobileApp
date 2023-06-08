@@ -26,6 +26,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 
@@ -95,10 +96,10 @@ public class EventDetailActivity extends AppCompatActivity {
             }
             txtJoinedPeople.setText(getString(R.string.joined_people, joinedPeopleNames.toString()));
 
-/*
-            SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault());
-            String formattedDate = sdf.format(new Date(event.getRequestDate()));
-            txtDate.setText(getString(R.string.date, formattedDate));*/
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH");
+            // Format the LocalDateTime object as a string
+            String formattedDateTime = event.getRequestDate().format(formatter);
+            txtDate.setText(getString(R.string.date, formattedDateTime));
 
             txtLimit.setText(getString(R.string.limit, event.getLimit()));
 

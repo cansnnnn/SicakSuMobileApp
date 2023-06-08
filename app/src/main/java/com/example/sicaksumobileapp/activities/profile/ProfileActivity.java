@@ -1,18 +1,27 @@
 package com.example.sicaksumobileapp.activities.profile;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toolbar;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 
 import com.example.sicaksumobileapp.R;
+import com.example.sicaksumobileapp.SicakSuApp;
+import com.example.sicaksumobileapp.models.SicakSuProfile;
+import com.example.sicaksumobileapp.models.SicakSuUser;
+import com.example.sicaksumobileapp.repository.EventRepo;
 
 import org.json.JSONObject;
 
@@ -20,6 +29,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.concurrent.ExecutorService;
 
 
 public class ProfileActivity extends AppCompatActivity {
@@ -28,7 +38,20 @@ public class ProfileActivity extends AppCompatActivity {
     private Button btnJoinedEvents;
     private FrameLayout fragmentContainer;
     private String profileId ;
-    private Button backButton;
+    private ImageView profileImage;
+    boolean imageDownloaded = false;
+
+
+    Handler imageHandler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(@NonNull Message msg) {
+
+            profileImage.setImageBitmap((Bitmap) msg.obj);
+            imageDownloaded = true;
+
+            return true;
+        }
+    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +61,7 @@ public class ProfileActivity extends AppCompatActivity {
         btnCreatedEvents = findViewById(R.id.btnCreatedEvents);
         btnJoinedEvents = findViewById(R.id.btnJoinedEvents);
         fragmentContainer = findViewById(R.id.fragmentContainer);
+        profileImage = findViewById(R.id.profileProfileImage);
 
         // calling the action bar
         ActionBar actionBar = getSupportActionBar();
@@ -82,6 +106,14 @@ public class ProfileActivity extends AppCompatActivity {
                 .commit();
     }
 
+    public void downloadImage(ExecutorService srv, String path){
+
+        if(imageDownloaded==false){
+            EventRepo repo = new EventRepo();
+            repo.downloadImage(srv,imageHandler,path);
+        }
+
+    }
     private void showJoinedEventsFragment() {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragmentContainer, new JoinedEventsFragment())
@@ -115,7 +147,8 @@ public class ProfileActivity extends AppCompatActivity {
                     // Parse the response JSON and extract the user's name
                     JSONObject profileJson = new JSONObject(response.toString());
                     String userName = profileJson.getString("name") +" "+ profileJson.getString("lastname");
-
+                    SicakSuApp app = (SicakSuApp) getApplication();
+                    downloadImage(app.srv,profileJson.getString("imageUrl"));
                     // Update the UI on the main thread
                     runOnUiThread(() -> {
                         // Find the TextView by its ID
